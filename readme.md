@@ -12,7 +12,7 @@ The Monitor class is located at app/Console/Commands/DebatesMonitor.php
 ## To run from system cron
 
 1. Edit crontab (terminal: 'crontab -e')
-2. Add following to crontab '* * * * * php {project_folder}/artisan monitor:debates >> /dev/null 2>&1'
+2. Add following to crontab '0 * * * 1,2,3,4 php {project_folder}/artisan monitor:debates >> /dev/null 2>&1' (only runs on Mon, Tue, Wen, Thu)
 
 ## To test
 
