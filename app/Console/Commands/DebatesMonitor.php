@@ -77,35 +77,39 @@ class DebatesMonitor extends Command
             File::makeDirectory($this->folder, 0755, true);
         }
 
-        $response = file_get_contents($this->url);
+        if ($response = file_get_contents($this->url)) {
+            // check if response is valid JSON
+            if ($this->isJSON($response)) {
 
-        // check if response is valid JSON
-        if ($this->isJSON($response)) {
+                $response = json_decode($response);
 
-            $response = json_decode($response);
+                // check if debates is set
+                if (isset($response->debates)) {
 
-            // check if debates is set
-            if (isset($response->debates)) {
-
-                // check if has any debates
-                if ($response->debates) {
-                    foreach ($response->debates as $debate) {
-                        if (!$this->isToday($debate->startsAt)) {
-                            $this->errors[] = "One of the debates wasn't today";
-                            break;
-                        } 
+                    // check if has any debates
+                    if ($response->debates) {
+                        foreach ($response->debates as $debate) {
+                            if (!$this->isToday($debate->startsAt)) {
+                                $this->errors[] = "One of the debates wasn't today";
+                                break;
+                            } 
+                        }
+                    } else {
+                        $this->errors[] = "Debates were missing from the API response";
                     }
+                    
                 } else {
                     $this->errors[] = "Debates were missing from the API response";
                 }
-                
-            } else {
-                $this->errors[] = "Debates were missing from the API response";
-            }
 
+            } else {
+                $this->errors[] = "One of the debates wasn't today";
+            }
         } else {
-            $this->errors[] = "One of the debates wasn't today";
+            $this->errors[] = "Failed to reach API";
         }
+
+        
 
         // send an email if there were any errors and log 
         if ($this->errors) {
