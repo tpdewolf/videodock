@@ -60,6 +60,7 @@ class DebatesMonitor extends Command
     {
         // add basepath to folder
         $this->folder = base_path().$this->folder;
+
         parent::__construct();
     }
 
@@ -71,6 +72,11 @@ class DebatesMonitor extends Command
     public function handle()
     {
         
+        // create log folder if doesnt exist 
+        if (!File::exists($this->folder)) {
+            File::makeDirectory($this->folder, 0755, true);
+        }
+
         $response = file_get_contents($this->url);
 
         // check if response is valid JSON
